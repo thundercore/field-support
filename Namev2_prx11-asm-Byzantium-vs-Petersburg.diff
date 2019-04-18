@@ -1,0 +1,86 @@
+--- contracts/Namev2_prx11.asm	2019-04-19 00:49:46.409038062 +0800
++++ contracts/Namev2_prx11.petersburg.asm	2019-04-19 00:49:17.116352277 +0800
+@@ -25,7 +25,7 @@
+     /* "contracts/Namev2_prx11.sol":170:188  owner = msg.sender */
+   dup1
+   sload
+-  not(sub(exp(0x02, 0xa0), 0x01))
++  not(sub(shl(0xa0, 0x01), 0x01))
+   and
+     /* "contracts/Namev2_prx11.sol":178:188  msg.sender */
+   caller
+@@ -64,9 +64,9 @@
+         /* "contracts/Namev2_prx11.sol":27:493  contract Namev2_prx11 {... */
+       pop
+       jumpi(tag_2, lt(calldatasize, 0x04))
+-      div(calldataload(0x00), 0x0100000000000000000000000000000000000000000000000000000000)
++      shr(0xe0, calldataload(0x00))
++      dup1
+       0x06fdde03
+-      dup2
+       eq
+       tag_3
+       jumpi
+@@ -397,7 +397,7 @@
+       0x40
+       dup1
+       mload
+-      0xffffffffffffffffffffffffffffffffffffffff
++      sub(shl(0xa0, 0x01), 0x01)
+       swap1
+       swap3
+       and
+@@ -440,7 +440,7 @@
+       pop
+         /* "contracts/Namev2_prx11.sol":402:491  function changeOwner(address newOwner) onlyOwner public {... */
+       calldataload
+-      0xffffffffffffffffffffffffffffffffffffffff
++      sub(shl(0xa0, 0x01), 0x01)
+       and
+       tag_23
+       jump	// in
+@@ -559,7 +559,7 @@
+         /* "contracts/Namev2_prx11.sol":288:396  function changeName(string memory n) onlyOwner public {... */
+     tag_18:
+         /* "contracts/Namev2_prx11.sol":254:259  owner */
+-      and(0xffffffffffffffffffffffffffffffffffffffff, sload(0x00))
++      and(sub(shl(0xa0, 0x01), 0x01), sload(0x00))
+         /* "contracts/Namev2_prx11.sol":240:250  msg.sender */
+       caller
+         /* "contracts/Namev2_prx11.sol":240:259  msg.sender == owner */
+@@ -710,13 +710,13 @@
+       jump	// out
+         /* "contracts/Namev2_prx11.sol":55:75  address public owner */
+     tag_20:
+-      and(0xffffffffffffffffffffffffffffffffffffffff, sload(0x00))
++      and(sub(shl(0xa0, 0x01), 0x01), sload(0x00))
+       dup2
+       jump	// out
+         /* "contracts/Namev2_prx11.sol":402:491  function changeOwner(address newOwner) onlyOwner public {... */
+     tag_23:
+         /* "contracts/Namev2_prx11.sol":254:259  owner */
+-      and(0xffffffffffffffffffffffffffffffffffffffff, sload(0x00))
++      and(sub(shl(0xa0, 0x01), 0x01), sload(0x00))
+         /* "contracts/Namev2_prx11.sol":240:250  msg.sender */
+       caller
+         /* "contracts/Namev2_prx11.sol":240:259  msg.sender == owner */
+@@ -733,9 +733,9 @@
+         /* "contracts/Namev2_prx11.sol":468:484  owner = newOwner */
+       dup1
+       sload
+-      not(0xffffffffffffffffffffffffffffffffffffffff)
++      not(sub(shl(0xa0, 0x01), 0x01))
+       and
+-      0xffffffffffffffffffffffffffffffffffffffff
++      sub(shl(0xa0, 0x01), 0x01)
+       swap3
+       swap1
+       swap3
+@@ -862,6 +862,6 @@
+       swap1
+       jump	// out
+ 
+-    auxdata: 0xa165627a7a72305820d3a048f02be32059646ba2c6baabfe0902aefd5660decac816eb87c4db88bb9d0029
++    auxdata: 0xa165627a7a723058200cfdd2efe845d832c8c54f1b81dcdcf36296b6e81e8074b975945ada8b03efa90029
+ }
+ 

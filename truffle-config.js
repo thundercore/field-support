@@ -76,6 +76,16 @@ module.exports = {
       websockets: false        // Enable EventEmitter interface for web3 (default: false)
     },
 
+    'thunder-staging': {
+      provider: () => {
+        if (privateKeys === null) {
+          throw (new Error('Create a .private-keys file'));
+        }
+        return new HDWalletProvider(privateKeys, 'https://rpc-staging.dev.tt-eng.com', 0 /*address_index*/, 1/*num_addresses*/);
+      },
+      network_id: '18',
+    },
+
     'thunder-testnet': {
       provider: () => {
         if (privateKeys === null) {
@@ -123,13 +133,14 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.4.25",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.5.7",    // Fetch exact version from solc-bin (default: truffle's version)
       settings: {           // see the solidity docs for advice about optimization and evmversion
         optimizer: {
           enabled: false,
           runs: 200
         },
         evmVersion: "byzantium"
+//        evmVersion: "petersburg" // this would fail on Thunder Core as of the current release
       }
     }
 //    solc: {
@@ -139,8 +150,8 @@ module.exports = {
 //          enabled: true,
 //          runs: 200
 //        },
-//      }
+//      },
 //      evmVersion: "byzantium"
-//  }
+//    }
   }
 }
