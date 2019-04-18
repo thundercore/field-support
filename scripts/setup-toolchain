@@ -1,0 +1,58 @@
+#!/bin/bash
+# vim: expandtab ts=4:sw=4
+
+DOWNLOAD_DIR="${HOME}"/Downloads
+
+set -o errexit
+set -o nounset
+
+OS="$(uname -s)"
+
+mkdir-chown-if-dir-not-writable() {
+    case $# in
+    1) DIR=$1;;
+    *) printf 'mkdir-chown-if-dir-not-writable DIR\n'>&2; return 2 ;;
+    esac
+    if touch "${DIR}"/TEST-WRITE-FILE 2>/dev/null; then
+        rm -f "${DIR}"/TEST-WRITE-FILE
+    else
+        sudo sh -c 'mkdir -p '"${DIR}"' && chown -R '"${USER}"' '"${DIR}"
+    fi
+}
+
+download-verify-file() {
+    case $# in
+    4) URL=$1; DOWNLOAD_DIR=$2; FILENAME=$3; SHA1=$4 ;;
+    *) printf 'download-verify-file: wrong number of arguments\n' >&2; return 1 ;;
+    esac
+    mkdir-chown-if-dir-not-writable "${DOWNLOAD_DIR}"
+    command pushd "${DOWNLOAD_DIR}" >/dev/null
+    if ! printf '%s %s\n' "${SHA1}" "${FILENAME}" | sha1sum --check --quiet; then
+        printf 'Downloading '"${URL}"'\n'
+        curl -o "${FILENAME}" "${URL}"
+        if ! printf '%s %s\n' "${SHA1}" "${FILENAME}" | sha1sum --check --quiet; then
+            printf 'FATAL: downloaded %s does NOT match expected SHA1: %s\n' "${FILENAME}" "${SHA1}" >&2; return 3
+        fi
+    fi
+    command popd >/dev/null
+}
+
+install-conda() {
+    # See ./scripts/environment.yml
+    MINICONDA_VERSION=4.5.12
+    MINICONDA_DIR=$HOME/miniconda3
+    case "${OS}" in
+    Linux)  MINICONDA_BASH_INSTALLER="Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh"
+            MINICONDA_SHA1=810e761a2bf1bad97de283740d33286d4ee6f3a1 ;;
+    Darwin) MINICONDA_BASH_INSTALLER="Miniconda3-${MINICONDA_VERSION}-MacOSX-x86_64.sh"
+            MINICONDA_SHA1=f44802d9a0d20f4f4adc4c9f1258677a57d091a7 ;;
+    *) printf 'Unsupported OS: "%s"\n' "${OS}" >&2; return 1
+    esac
+    if [ ! -d "${MINICONDA_DIR}" ]; then
+        download-verify-file "https://repo.anaconda.com/miniconda/${MINICONDA_BASH_INSTALLER}" \
+                           "${DOWNLOAD_DIR}" "${MINICONDA_BASH_INSTALLER}" "${MINICONDA_SHA1}"
+        bash ${DOWNLOAD_DIR}/${MINICONDA_BASH_INSTALLER} -b -p "${MINICONDA_DIR}" -f
+    fi
+}
+
+install-conda

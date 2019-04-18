@@ -1,0 +1,34 @@
+{
+  "name": "field-support",
+  "version": "0.0.1",
+  "main": "trufflej-config.js",
+  "license": "LicenseRef-COPYING",
+  "description": "Thunder Token Application Support",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "5.16.0",
+    "ethlint": "1.2.3",
+    "mocha": "^6.1.2",
+    "openzeppelin-test-helpers": "^0.3.2"
+  },
+  "dependencies": {
+    "solc": "0.4.25",
+    "truffle": "^5.0.13",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.5"
+  },
+  "scripts": {
+    "test": "truffle test",
+    "migrate": "truffle migrate",
+    "deploy": "truffle migrate",
+    "compile": "truffle compile",
+    "build": "truffle build",
+    "lint": "solium -d contracts && eslint ."
+  },
+  "keywords": [
+    "smart contract"
+  ],
+  "author": ""
+}
