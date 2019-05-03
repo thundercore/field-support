@@ -66,7 +66,7 @@ module.exports = {
       // from: <address>,        // Account to send txs from (default: accounts[0])
       // websockets: true        // Enable EventEmitter interface for web3 (default: false)
     // },
-    localchain: {
+    devnet: {
       host: '127.0.0.1',      // Localhost
       port: 8545,             // Custom port
       network_id: '*',         // local chain
@@ -76,12 +76,22 @@ module.exports = {
       websockets: false        // Enable EventEmitter interface for web3 (default: false)
     },
 
+    'localchain': {
+      provider: () => {
+        if (privateKeys === null) {
+          throw (new Error('Create a .private-keys file'));
+        }
+        return new HDWalletProvider(privateKeys, 'http://localhost:8545', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
+      },
+      network_id: '19',
+    },
+
     'thunder-testnet': {
       provider: () => {
         if (privateKeys === null) {
           throw (new Error('Create a .private-keys file'));
         }
-        return new HDWalletProvider(privateKeys, 'https://testnet-rpc.thundercore.com', 0 /*address_index*/, 1/*num_addresses*/);
+        return new HDWalletProvider(privateKeys, 'https://testnet-rpc.thundercore.com', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
       },
       network_id: '18',
     },
@@ -91,7 +101,7 @@ module.exports = {
         if (privateKeys === null) {
           throw (new Error('Create a .private-keys file'));
         }
-        return new HDWalletProvider(privateKeys, 'https://mainnet-rpc.thundercore.com', 0 /*address_index*/, 1/*num_addresses*/);
+        return new HDWalletProvider(privateKeys, 'https://mainnet-rpc.thundercore.com', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
       },
       network_id: '108',
     },
