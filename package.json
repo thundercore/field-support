@@ -15,7 +15,7 @@
     "openzeppelin-test-helpers": "^0.3.2"
   },
   "dependencies": {
-    "solc": "0.4.25",
+    "solc": "0.5.8",
     "truffle": "^5.0.13",
     "truffle-hdwallet-provider": "^1.0.0-web3one.5"
   },
