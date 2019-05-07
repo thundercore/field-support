@@ -21,8 +21,25 @@
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const fs = require('fs');
-// const infuraKey = "fj4jll3k.....";
-//
+const JSON5 = require('json5');
+
+let infuraProjectId = null, infuraProjectSecret = null;
+try {
+  const localConfStr = fs.readFileSync('local.jsonc', { encoding: 'utf8' });
+  const localConf = JSON5.parse(localConfStr);
+  let t = localConf['infura_project_id'];
+  if (t) {
+    infuraProjectId = t;
+  }
+  t = localConf['infura_project_secret'];
+  if (t) {
+    infuraProjectSecret = t;
+  }
+} catch (err) {
+  if (err.code !== 'ENOENT') {
+    throw err;
+  }
+}
 let privateKeys;
 try {
   privateKeys = fs.readFileSync('.private-keys', {encoding: 'ascii'}).split('\n').filter(x => x.length > 0);
@@ -104,6 +121,24 @@ module.exports = {
         return new HDWalletProvider(privateKeys, 'https://mainnet-rpc.thundercore.com', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
       },
       network_id: '108',
+    },
+
+    ropsten: {
+      provider: () => {
+        if (privateKeys === null) {
+          throw (new Error('Create a .private-keys file'));
+        }
+        if (infuraProjectId === null) {
+          throw (new Error('Set "infura_project_id" in local.jsonc'));
+        }
+        if (infuraProjectSecret === null) {
+          throw (new Error('Set "infura_project_secret" in local.jsonc'));
+        }
+        // FIXME: infuraProjectSecret not used yet
+        return new HDWalletProvider(privateKeys, `https://ropsten.infura.io/v3/${infuraProjectId}`, 0 /*address_index*/,
+          privateKeys.length/*num_address*/);
+      },
+      network_id: 3
     },
 
     // Useful for deploying to a public network.
