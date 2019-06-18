@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "truffle": "5.0.22",
-    "truffle-hdwallet-provider": "1.0.10"
+    "truffle-hdwallet-provider": "1.0.10",
+    "openzeppelin-solidity": "2.0.1"
   },
   "scripts": {
     "test": "truffle test",

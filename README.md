@@ -31,8 +31,16 @@ $ truffle develop --log
 
 In another terminal, run
 ```
-$ truffle test
+$ truffle migrate --reset
 ```
+
+## Starting The Web Front-End
+```
+$ cd client
+$ npm run start
+```
+
+Then open a browser to http://localhost:3000
 
 ## Test against ThunderCore testnet or mainnet
 Make sure to have either a `.private-keys` or a `.mnemonics` file with the
@@ -46,7 +54,10 @@ for testnet and mainnet, respectively.
 
 Deploy the contract and run unit tests:
 ```
-$ truffle test --network thunder-testnet # or --network thunder-mainnet
+$ truffle migrate --network thunder-testnet # or --network thunder-mainnet
 ```
+
+Remember to point Metamask's current network to thunder-mainnet (https://mainnet-rpc.thundercore.com) or thunder-testnet (https://testnet-rpc.thundercore.com/)
+after creating those two networks via Avatar -> Settings -> Networks .
 
 See [package.json](package.json) and [truffle-config.js](truffle-config.js) fore more actions.

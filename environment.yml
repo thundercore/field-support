@@ -1,4 +1,4 @@
-name: field-support
+name: truffle-practice-0x
 channels:
   - conda-forge
 dependencies:
