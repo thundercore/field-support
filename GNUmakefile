@@ -8,7 +8,7 @@ CONDA_ENV_BIN_DIR := $(CONDA_ENV_DIR)/bin
 NODE_MODULES_DIR := $(TOP_DIR)/node_modules
 NODE_MODULES_BIN_DIR := $(NODE_MODULES_DIR)/.bin
 PYTHON_VERSION := 3.7
-SOLC_VERSION := 0.5.7
+SOLC_VERSION := 0.5.9
 EVM_VERSION := byzantium
 SOLC_BIN_DIR := $(CONDA_ENV_DIR)/lib/python$(PYTHON_VERSION)/site-packages/solcx/bin
 SOLC := solc
@@ -40,7 +40,7 @@ install-solc:
 	ln -sf solc-v$(SOLC_VERSION) $(SOLC_BIN_DIR)/solc
 
 PREFERRED_INTERACTIVE_SHELL ?= bash
-MAKE_SHELL_PS1 ?= 💁' $$ '
+MAKE_SHELL_PS1 ?= ⚡✋' $$ '
 .PHONY: shell
 ifeq ($(PREFERRED_INTERACTIVE_SHELL),bash)
 shell:
@@ -48,7 +48,7 @@ shell:
 	printf '[ -e $$HOME/.bashrc ] && source $$HOME/.bashrc\n' > $$INIT_FILE; \
 	printf '[ -e Local.env ] && source Local.env\n' >> $$INIT_FILE; \
 	printf 'PS1='"$(MAKE_SHELL_PS1) "'\n' >> $$INIT_FILE; \
-	printf 'PATH=$(PATH)\n' >> $$INIT_FILE; \
+	printf 'export PATH="%s"\n' "$(PATH)" >> $$INIT_FILE; \
 	$(PREFERRED_INTERACTIVE_SHELL) --init-file $$INIT_FILE || true
 else ifeq ($(PREFERRED_INTERACTIVE_SHELL),fish)
 shell:
