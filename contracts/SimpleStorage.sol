@@ -1,6 +1,6 @@
 // In-Reply-to Ivan, https://youtu.be/BAX2j609mZk?t=708
-// Solidity 0.5.8+ now works on ThunderCore if you go to
-// http://remix-alpha.ethereum.org
+// Solidity 0.5.10 now works on ThunderCore if you go to
+// http://remix.ethereum.org
 // Click "Solidity" -> Click the "Solidity compiler" button on the left
 // and set the `EVM Version` field to "byzantium".
 //
@@ -17,10 +17,10 @@ contract SimpleStorage {
   uint storedData;
 
   function set(uint x) public {
-	  storedData = x;
+    storedData = x;
   }
 
   function get() public view returns (uint) {
-	  return storedData;
+    return storedData;
   }
 }
