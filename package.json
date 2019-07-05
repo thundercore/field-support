@@ -16,9 +16,8 @@
   },
   "dependencies": {
     "json5": "^2.1.0",
-    "solc": "0.4.25",
-    "truffle": "^5.0.13",
-    "truffle-hdwallet-provider": "^1.0.0-web3one.5"
+    "truffle": "5.0.22",
+    "truffle-hdwallet-provider": "^1.0.13"
   },
   "scripts": {
     "test": "truffle test",
