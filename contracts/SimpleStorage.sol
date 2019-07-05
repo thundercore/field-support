@@ -16,11 +16,18 @@ pragma solidity ^0.5;
 contract SimpleStorage {
   uint storedData;
 
+  event Closed(uint);
+
   function set(uint x) public {
-	  storedData = x;
+    storedData = x;
   }
 
   function get() public view returns (uint) {
-	  return storedData;
+    return storedData;
+  }
+
+  function close() external {
+    emit Closed(now); // solium-disable-line security/no-block-members
+    selfdestruct(address(0));
   }
 }
