@@ -11,4 +11,13 @@ contract('SimpleStorage', function(_) {
     await c.set(1337);
     expect(await c.get()).to.be.bignumber.that.equals('1337');
   });
+  it('getCode should return empty after self-destruct', async () => {
+    const c = await SimpleStorage.deployed();
+    const web3 = SimpleStorage.web3;
+    const code = await web3.eth.getCode(c.address);
+    expect(code).not.eq('').and.not.eq('0x');
+    await c.close();
+    const code1 = await web3.eth.getCode(c.address);
+    expect(code1).oneOf(['', '0x']);
+  });
 });
