@@ -1,7 +1,7 @@
 {
   "name": "field-support",
   "version": "0.0.1",
-  "main": "trufflej-config.js",
+  "main": "truffle-config.js",
   "license": "LicenseRef-COPYING",
   "description": "Thunder Token Application Support",
   "directories": {
@@ -12,12 +12,11 @@
     "eslint": "5.16.0",
     "ethlint": "1.2.3",
     "mocha": "^6.1.2",
-    "openzeppelin-test-helpers": "^0.3.2"
+    "openzeppelin-test-helpers": "^0.4.3"
   },
   "dependencies": {
     "json5": "^2.1.0",
-    "solc": "0.4.25",
-    "truffle": "^5.0.13",
+    "truffle": "^5.0.35",
     "truffle-hdwallet-provider": "^1.0.0-web3one.5"
   },
   "scripts": {
