@@ -103,6 +103,16 @@ module.exports = {
       network_id: '19',
     },
 
+    'thunder-venus': {  // `venus` is the first PaLa R1 testnet. It coexisted with `thunder-testnet` for a short while.
+      provider: () => {
+        if (privateKeys === null) {
+          throw (new Error('Create a .private-keys file'));
+        }
+        return new HDWalletProvider(privateKeys, 'https://venus-rpc.thundercore.com', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
+      },
+      network_id: '18',
+    },
+
     'thunder-testnet': {
       provider: () => {
         if (privateKeys === null) {
