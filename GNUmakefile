@@ -1,4 +1,4 @@
-PROJECT_NAME := FIELD_SUPPORT
+PROJECT_NAMe := FIELD_SUPPORT
 
 CONDA := $(HOME)/miniconda3/bin/conda
 
@@ -32,7 +32,7 @@ conda-env:
 	else \
 		$(CONDA) env update -f environment.yml -p $(CONDA_ENV_DIR); \
 	fi
-	$(CONDA_ENV_BIN_DIR)/npm install
+	$(CONDA_ENV_BIN_DIR)/yarn install
 
 .PHONY: install-solc
 install-solc:
