@@ -21,7 +21,7 @@ node_modules/
 # https://stackoverflow.com/questions/44206782/do-i-commit-the-package-lock-json-file-created-by-npm-5
 # ignoring package-lock.json to avoid git conflicts and merges
 package-lock.json
-frontend/hodl/package-lock.json
+yarn.lock
 
 # Contract EVM Assembly
 contracts/*.asm

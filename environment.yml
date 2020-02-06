@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - nodejs=10.15.3
+  - yarn
   - python=3.7
   - ipython
   - pip:
