@@ -13,30 +13,17 @@ const programName = () => {
     return path.basename(process.argv[1])
 }
 
-const signTx = async (fromAccount, chainId, gasLimit, gasPrice, nonce, toAddress, value, data) => {
-    const fromAddress = fromAccount.address
-    const nonceHex = Web3.utils.toHex(nonce)
-    const rawTx = {
-        'gasLimit': gasLimit,
-        'chainId': chainId,
-        'gasPrice': gasPrice,
-        'nonce': nonceHex,
-        'from': fromAddress,
-        'to': toAddress,
-        'value': value,
-        'data': data,
-    }
-    // 'gasLimit': gasLimitHex,
-    const signedTx = await fromAccount.signTransaction(rawTx)
-    return signedTx.rawTransaction // hex string
-}
-
 const web3Url = () => {
     let u = process.env['WEB3_PROVIDER_URI']
     if (u === undefined) {
         u = thunderWsUrl
     }
     return u
+}
+
+const signTx = async (fromAccount, tx) => {
+    const signedTx = await fromAccount.signTransaction(tx)
+    return signedTx.rawTransaction // hex string
 }
 
 const setup = async () => {
@@ -62,44 +49,80 @@ const setup = async () => {
     return [ web3ProviderUrl, web3, networkId, contractAddress, contract, account ]
 }
 
+const prettyPrint = (o) => {
+   return util.inspect(o, {showHidden: false, depth: null, colors: true})
+}
+
 const recordWrite = async () => {
-    const [web3ProviderUrl, web3, chainId, contractAddress, contract, account] = await setup()
+    const [web3ProviderUrl, web3, chainId, contractAddress, contract, fromAccount] = await setup()
     console.log('web3ProviderUrl:', web3ProviderUrl)
     const txnData = contract.methods.write().encodeABI()
-    console.log('account.address:', account.address)
-    const nonce = await web3.eth.getTransactionCount(account.address)
-    const gasLimit = 100000
-    const gasPrice = await web3.eth.getGasPrice()
-    console.log('gasPrice:', gasPrice)
-    const value = 0xbeef
-    const rawTx = await signTx(account, chainId, gasLimit, gasPrice, nonce, contractAddress, value, txnData)
-    const r = await web3.eth.sendSignedTransaction(rawTx)
-    if (true) {
-        console.log(util.inspect(r, {showHidden: false, depth: null, colors: true}))
-    } else {
-        console.log('SimpleRecord.write:', r)
-        console.log('SimpleRecord.write: topics:', r['logs'][0]['topics'])
+    console.log('account.address:', fromAccount.address)
+    const promiseResults = await Promise.all([
+        web3.eth.getTransactionCount(fromAccount.address),
+        web3.eth.getGasPrice(),
+    ])
+    const nonce = promiseResults[0]
+    const gasPrice = promiseResults[1]
+    const tx = {
+        'gasLimit': 0,
+        'chainId': chainId,
+        'gasPrice': gasPrice,
+        'nonce': Web3.utils.toHex(nonce),
+        'from': fromAccount.address,
+        'to': contractAddress,
+        'value': 0xbeef,
+        'data': txnData,
     }
+    const gasMultiple = 2.0
+    tx.gasLimit = (await web3.eth.estimateGas(tx)) * gasMultiple
+    console.log('tx:', prettyPrint(tx))
+    const rawTxStr = await signTx(fromAccount, tx)
+    const r = await web3.eth.sendSignedTransaction(rawTxStr)
+    console.log('sendTransaction:', prettyPrint(r))
     return 0
 }
 
 const eventSubscribe = () => {
     return new Promise((resolve, reject) => {
         setup().then(([web3ProviderUrl, web3, chainId, contractAddress, contract, account]) => {
+            console.log('web3ProviderUrl:', web3ProviderUrl)
+            console.log('contractAddress:', contractAddress)
+            // change 'Record' to the desired event from your contract
+            contract.events.Record({}).on('data', (ev) => {
+                console.log('Record:', prettyPrint(ev))
+            }).on('changed', (ev) => { console.log('event removed:', prettyPrint(ev))
+            }).on('error', console.error)
+        })
+    })
+}
+
+const logSubscribe = () => {
+    return new Promise((resolve, reject) => {
+        setup().then(([web3ProviderUrl, web3, chainId, contractAddress, contract, account]) => {
             let eventCount = 0
             console.log('web3ProviderUrl:', web3ProviderUrl)
             console.log('contractAddress:', contractAddress)
-            const subscription = web3.eth.subscribe('logs', { address: contractAddress }, (err, log) => {
-                console.log('subscription callback')
+            console.log('contract.options.jsonInterface:', prettyPrint(contract.options.jsonInterface))
+            const eventAbis = contract.options.jsonInterface.filter((abiObj) => abiObj.type === 'event')
+            web3.eth.subscribe('logs', { address: contractAddress }, (err, log) => {
+                console.log('eth.subscribe("logs") callback')
                 if (err) {
                     console.log('logs callback, err:', err)
                     reject(err)
                     return
                 }
-                //const e = web3.eth.abi.decodeLog(eventAbi.inputs, log.data, log.topics.slice(1))
                 eventCount++
                 console.log(`log[${eventCount}]:`, log)
-                resolve(0)
+                const eventSig = log.topics[0]
+                for (let abi of eventAbis) {
+                    if (eventSig === abi.signature) {
+                        const decoded = web3.eth.abi.decodeLog(abi.inputs, log.data, log.topics.slice(1))
+                        console.log('Decoded Event:', prettyPrint(abi), '\n', prettyPrint(decoded))
+                        resolve(0)
+                        return
+                    }
+                }
             })
         })
     })
@@ -110,6 +133,8 @@ const eventSubscribe = () => {
         process.exit(await recordWrite())
     } else if (programName().endsWith('-event-subscribe')) {
         process.exit(await eventSubscribe())
+    } else if (programName().endsWith('-log-subscribe')) {
+        process.exit(await logSubscribe())
     } else {
         console.error(`unsupported program name: "${programName()}"`)
         process.exit(2)

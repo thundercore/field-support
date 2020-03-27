@@ -98,6 +98,16 @@ module.exports = {
         if (privateKeys === null) {
           throw (new Error('Create a .private-keys file'));
         }
+        return new HDWalletProvider(privateKeys, 'http://localhost:18545', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
+      },
+      network_id: '19',
+    },
+
+    'pala-dev': {
+      provider: () => {
+        if (privateKeys === null) {
+          throw (new Error('Create a .private-keys file'));
+        }
         return new HDWalletProvider(privateKeys, 'http://localhost:8545', 0 /*address_index*/, privateKeys.length/*num_addresses*/);
       },
       network_id: '19',
