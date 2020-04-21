@@ -1,9 +1,6 @@
-name: truffle-practice-0x
+name: field-support
 channels:
   - conda-forge
 dependencies:
   - nodejs=10.15.3
-  - python=3.7
-  - ipython
-  - pip:
-    - py-solc-x
+  - yarn
