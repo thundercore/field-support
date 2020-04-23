@@ -10,7 +10,7 @@
     "@truffle/hdwallet-provider": "^1.0.34",
     "json5": "^2.1.0",
     "truffle": "^5.1.22",
-    "wombat": "^1.0.5"
+    "ethereum-hdwallet": "^0.0.26"
   },
   "scripts": {
     "test": "truffle test",

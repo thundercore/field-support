@@ -1,5 +1,8 @@
 # Thunder Core Field Support Template
 
+## Guide to the Implementation
+[`ethereum-hdwallet`](https://github.com/ethereumjs/ethereumjs-wallet/blob/master/test/hdkey.ts) provides a `fromMnemonic()` method that accepts a buffer or string, uses `bip32.mnemonicToSeedSync(s)` to produce a seed from the mnemonic then use [`ethereumjs-wallet/hdkey`](https://github.com/ethereumjs/ethereumjs-wallet/blob/master/test/hdkey.ts) to do the real work.
+
 ## Private Keys for Control of Accounts
 Either:
 1. Write your 12-word mnemonic (seed phrase) to a file named `.mnemonic` OR
@@ -14,7 +17,7 @@ $ make conda-env
 
 If you already have `node` installed, just run:
 ```
-$ npm install
+$ yarn install
 ```
 
 ## Start Development Session
@@ -24,14 +27,9 @@ $ make shell
 
 this would put commands like `truffle` etc in your `PATH`.
 
-## Test against a local `truffle develop` chain
+## Test
 ```
-$ truffle develop --log
-```
-
-In another terminal, run
-```
-$ truffle test
+yarn test
 ```
 
 ## Test against ThunderCore testnet or mainnet
