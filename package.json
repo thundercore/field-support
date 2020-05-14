@@ -3,17 +3,25 @@
   "version": "0.0.1",
   "main": "trufflej-config.js",
   "license": "LicenseRef-COPYING",
+  "description": "Thunder Token Application Support",
   "directories": {
     "test": "test"
   },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "5.16.0",
+    "ethlint": "1.2.3",
+    "mocha": "^6.2.2",
+    "openzeppelin-test-helpers": "^0.3.2"
+  },
   "dependencies": {
-    "@truffle/hdwallet-provider": "^1.0.34",
     "json5": "^2.1.0",
-    "truffle": "^5.1.22",
-    "wombat": "^1.0.5"
+    "@truffle/hdwallet-provider": "^1.0.34",
+    "truffle": "^5.1.22"
   },
   "scripts": {
     "test": "truffle test",
+    "test-nonchain": "mocha",
     "migrate": "truffle migrate",
     "deploy": "truffle migrate",
     "compile": "truffle compile",
