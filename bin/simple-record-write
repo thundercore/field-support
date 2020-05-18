@@ -7,7 +7,10 @@ const Web3 = require('web3')
 const Accounts = require('web3-eth-accounts')
 const util = require('util')
 
+// truffle migrate --reset --network thunder-mainnet
 const thunderWsUrl = 'wss://mainnet-ws.thundercore.com'
+// truffle migrate --reset --network thunder-testnet
+//const thunderWsUrl = 'wss://testnet-ws.thundercore.com'
 
 const programName = () => {
     return path.basename(process.argv[1])
@@ -79,7 +82,7 @@ const recordWrite = async () => {
     console.log('tx:', prettyPrint(tx))
     const rawTxStr = await signTx(fromAccount, tx)
     const r = await web3.eth.sendSignedTransaction(rawTxStr)
-    console.log('sendTransaction:', prettyPrint(r))
+    console.log('sendTransaction: receipt:', prettyPrint(r))
     return 0
 }
 
