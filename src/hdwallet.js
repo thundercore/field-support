@@ -36,4 +36,6 @@ const fromMnemonic = (s /*: string or buffer */) => {
 
 module.exports = {
   fromMnemonic: fromMnemonic,
+  TrustWalletHdPath: TrustWalletHdPath,
+  MetaMaskHdPath: MetaMaskHdPath,
 }
