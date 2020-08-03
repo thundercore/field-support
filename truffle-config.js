@@ -47,6 +47,26 @@ module.exports = {
       port: 9545, // Standard Ethereum port (default: none)
       network_id: "*" // Any network (default: none)
     },
+    "localchain": {
+      provider: () => {
+        if (privateKeys === null && mnemonic === null) {
+          throw new Error("Please create a .private-keys or .mnemonic file");
+        }
+        return privateKeys
+          ? new HDWalletProvider(
+              privateKeys,
+              'http://127.0.0.1:8545',
+              0, // <- change address_index if you want to default to an address other than the first one
+              privateKeys.length
+            )
+          : new HDWalletProvider(
+              mnemonic,
+              'http://127.0.0.1:8545',
+              0 // <- change address_index if you want to use an address other than the first one
+            );
+      },
+      network_id: "19"
+    },
     "thunder-testnet": {
       provider: () => {
         if (privateKeys === null && mnemonic === null) {
@@ -98,7 +118,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.4.25", // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.4.26", // Fetch exact version from solc-bin (default: truffle's version)
       settings: {
         // see the solidity docs for advice about optimization and evmversion
         optimizer: {

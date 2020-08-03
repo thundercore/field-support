@@ -8,10 +8,10 @@ CONDA_ENV_BIN_DIR := $(CONDA_ENV_DIR)/bin
 NODE_MODULES_DIR := $(TOP_DIR)/node_modules
 NODE_MODULES_BIN_DIR := $(NODE_MODULES_DIR)/.bin
 PYTHON_VERSION := 3.7
-SOLC_VERSION := 0.5.9
+SOLC_VERSION := 0.4.26
 EVM_VERSION := byzantium
-SOLC_BIN_DIR := $(CONDA_ENV_DIR)/lib/python$(PYTHON_VERSION)/site-packages/solcx/bin
-SOLC := solc
+SOLC_BIN_DIR := $(HOME)/solc-bin
+SOLC := solc-$(SOLC_VERSION)
 export PATH := $(SOLC_BIN_DIR):$(NODE_MODULES_BIN_DIR):$(CONDA_ENV_BIN_DIR):$(PATH)
 -include Local.mk
 

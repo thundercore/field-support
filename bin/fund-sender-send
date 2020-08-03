@@ -1,0 +1,177 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const process = require('process');
+const path = require('path');
+const util = require('util');
+
+const JSON5 = require('json5');
+const Eth = require('web3-eth');
+const Web3Utils = require('web3-utils');
+const Accounts = require('web3-eth-accounts');
+
+const networkInfo = {
+    rpcUrl: 'http://localhost:8545',
+};
+
+const readJsonFile = (fileName) => {
+    const s = fs.readFileSync(fileName, {encoding: 'utf8'});
+    return JSON.parse(s);
+}
+
+const readConfig = () => {
+    const localConfStr = fs.readFileSync('local.jsonc', {encoding: 'utf8'});
+    return JSON5.parse(localConfStr);
+}
+
+const prettyPrint = (o) => {
+    return util.inspect(o, {showHidden: false, depth: null, colors: true});
+}
+
+const contractsDataDir = () => {
+    return path.normalize(path.join(path.dirname(process.argv[1]), '..', 'build', 'contracts'));
+}
+
+const getContractInstance = (contractCtor, options) => {
+    const contractDataJsonBasename = options['contractDataJsonBasename'];
+    let abi, address;
+    if (contractDataJsonBasename) {
+        const networkId = options['networkId'];
+        if (!networkId) {
+            throw new Error(`both "contractDataJsonBasename" ("${contractDataJsonBasename}") and "networkId" ("${networkId}") must be specified`);
+        }
+        const contractDataPath = path.join(contractsDataDir(), `${contractDataJsonBasename}.json`);
+        const d = readJsonFile(contractDataPath);
+        const n = d['networks'];
+        if (n === undefined) {
+            throw new Error(`${contractDataPath} does not contain a "networks" section`);
+        }
+        const nData = n[networkId];
+        if (nData === undefined) {
+            throw new Error(`${contractDataPath} is not deployed to networkId: ${networkId}`);
+        }
+        address = nData['address'];
+        if (address === undefined) {
+            throw new Error(`${contractDataPath} is not deployed to networkId: ${networkId} (address not found)`);
+        }
+        abi = d['abi'];
+        if (abi === undefined) {
+            throw new Error(`${contractDataPath} does not contain an "abi" section`);
+        }
+    } else {
+        abi = options['abi'];
+        address = options['address'];
+        if (!abi || ! address) {
+            throw new Error(`both "abi" ("${abi}") and "address" ("${address}") must be specified`);
+        }
+    }
+    return new contractCtor(abi, address);
+}
+
+const getFundSenderInstance = (eth, chainId) => {
+    return getContractInstance(eth.Contract, {contractDataJsonBasename: 'FundSender', networkId: chainId});
+}
+
+const txnSend = async (eth, networkId, toAddress, fromAccount, value, gasLimit, gasPrice) => {
+    const nonce = await eth.getTransactionCount(fromAccount.address)
+    const txn = {
+        from: fromAccount.address,
+        nonce: nonce,
+        chainId: networkId,
+        to: toAddress,
+        data: null,
+        value: value,
+        gasLimit: gasLimit,
+        gasPrice: gasPrice,
+    }
+    const signed = await fromAccount.signTransaction(txn)
+    return eth.sendSignedTransaction(signed.rawTransaction)
+}
+
+const contractSend = async (eth, networkId, contractAddress, contractMethodObj, fromAccount, value, gasPrice) => {
+    const txnData = contractMethodObj.encodeABI()
+    const nonce = await eth.getTransactionCount(fromAccount.address)
+    const txn = {
+        from: fromAccount.address,
+        nonce: nonce,
+        chainId: networkId,
+        to: contractAddress,
+        data: txnData,
+        value: value,
+        gasPrice: gasPrice,
+    }
+    console.log('txn:', txn)
+    const gasLimit = await eth.estimateGas(txn)
+    txn.gas = gasLimit
+    const signed = await fromAccount.signTransaction(txn)
+    return eth.sendSignedTransaction(signed.rawTransaction)
+}
+
+const tokenOwner = async () => {
+    const eth = new Eth(tokenInfo.rpcUrl);
+    const contract = getTokenContractInstance(eth);
+    const owner = await contract.methods.owner().call();
+    console.log('owner:', owner);
+}
+
+const readPrivateKeysFile = () => {
+    return fs.readFileSync('.private-keys', {encoding: 'utf8'})
+    .split("\n")
+    .filter(x => x.length > 0)
+    .map((x) => `0x${x}`);
+}
+
+const generateAddresses = (accountsInstance, n) => {
+    const receiverAccounts = [];
+    for (let i = 0; i < n; i++) {
+        receiverAccounts.push(accountsInstance.create());
+    }
+    const receivers = receiverAccounts.map((x) => x.address);
+    return receivers;
+}
+
+const fundSenderSend = async (args) => {
+    const printUsageExit = () => {
+        console.error(`usage: ${programName()} NUMBER_OF_ADDRESSES`);
+        process.exit(2);
+    };
+    if (args.length !== 1) {
+        printUsageExit();
+    }
+    const N_RECEIVERS = parseInt(args[0]);
+    const sks = readPrivateKeysFile();
+    const accounts = new Accounts();
+    const ownerAccount = accounts.privateKeyToAccount(sks[0]);
+    const eth = new Eth(networkInfo.rpcUrl);
+    const networkId = await eth.net.getId();
+    const contract = getFundSenderInstance(eth, networkId);
+    const gasPrice = 1*1000*1000*1000
+    const receivers = generateAddresses(accounts, N_RECEIVERS);
+    let receipt;
+    receipt = await contractSend(eth, networkId, contract.options.address,
+        contract.methods.send(receivers),
+        ownerAccount, receivers.length, gasPrice);
+    console.log('send: receipt:', prettyPrint(receipt))
+    console.log('send: receipt.gasUsed:', prettyPrint(receipt.gasUsed), `< ${21000*receivers.length}:`, (receipt.gasUsed < 21000 * receivers.length))
+    if (N_RECEIVERS == 8) {
+        const r = generateAddresses(accounts, N_RECEIVERS);
+        receipt = await contractSend(eth, networkId, contract.options.address,
+            contract.methods.send8(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]),
+            ownerAccount, receivers.length, gasPrice);
+        console.log('send8: receipt:', prettyPrint(receipt))
+        console.log('send8: receipt.gasUsed:', prettyPrint(receipt.gasUsed), `< ${21000*r.length}:`, (receipt.gasUsed < 21000 * r.length))
+    }
+}
+
+const programName = () => {
+    return path.basename(process.argv[1])
+}
+
+if (programName() === 'fund-sender-send') {
+    fundSenderSend(process.argv.slice(2)).then(() => {
+        process.exit(0)
+    }).catch((err) => {
+        console.log('ERROR:', err)
+        process.exit(1)
+    })
+}

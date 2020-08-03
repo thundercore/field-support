@@ -1,5 +1,5 @@
 # custom truffle-config.js setup
-.private-keys
+.private-keys*
 
 # Vim
 *.swp
