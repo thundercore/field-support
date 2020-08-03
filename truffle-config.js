@@ -47,6 +47,27 @@ module.exports = {
       port: 9545, // Standard Ethereum port (default: none)
       network_id: "*" // Any network (default: none)
     },
+    "localchain": {
+      provider: () => {
+        const url = 'http://127.0.0.1:8545';
+        if (privateKeys === null && mnemonic === null) {
+          throw new Error("Please create a .private-keys or .mnemonic file");
+        }
+        return privateKeys
+          ? new HDWalletProvider(
+              privateKeys,
+              url,
+              0, // <- change address_index if you want to default to an address other than the first one
+              privateKeys.length
+            )
+          : new HDWalletProvider(
+              mnemonic,
+              url,
+              0 // <- change address_index if you want to use an address other than the first one
+            );
+      },
+      network_id: "19"
+    },
     "thunder-testnet": {
       provider: () => {
         if (privateKeys === null && mnemonic === null) {
