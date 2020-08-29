@@ -23,7 +23,7 @@ const mnemonic = fs.readFileSync(mnemonics_filename, { encoding: "ascii" }).trim
 const w = HdWallet.fromMnemonic(mnemonic);
 
 console.log(`TrustWallet address (${HdWallet.TrustWalletHdPath}):`, w.trustWalletAddress(0));
-console.log('TrustWallet private key:', w.metaMaskPrivateKey(0));
+console.log('TrustWallet private key:', w.trustWalletPrivateKey(0));
 
 console.log(`MetaMask address (${HdWallet.MetaMaskHdPath}):`, w.metaMaskAddress(0));
-console.log('MetaMask private key:', w.trustWalletPrivateKey(0));
+console.log('MetaMask private key:', w.metaMaskPrivateKey(0));
