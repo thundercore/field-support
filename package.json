@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.0.34",
-    "json5": "^2.1.0",
+    "json5": "^2.2.2",
     "truffle": "^5.1.22",
     "wombat": "^1.0.5"
   },
